@@ -24,12 +24,12 @@ import java.util.Map;
 
 public class WordDocumentGenerator {
 
-    private static final String DB_HOST = "127.0.0.1";
+    private static final String DB_HOST = "192.168.10.147";
     private static final String DB_PORT = "3306";
     private static final String DB_NAME = "medicare_test";
     private static final String DB_USER = "root";
     private static final String DB_PASSWORD = "123456";
-    private static final String TARGET_SCHEMA = "medicare_test";
+    private static final String TARGET_SCHEMA = "medicare_202588";
 
     private static final String HEADER_COLOR = "D9D9D9";
 
@@ -132,12 +132,12 @@ public class WordDocumentGenerator {
             XmlCursor cursor = getInsertionCursor(targetParagraph);
 
             for (Map.Entry<String, List<DataDictionary>> entry : dicTypeMap.entrySet()) {
-                String dicTypeName = entry.getKey();
+                String dicTypeCode = entry.getKey();
                 List<DataDictionary> typeDictionaries = entry.getValue();
 
-                String dicTypeCode = "";
+                String dicTypeName = "";
                 if (!typeDictionaries.isEmpty()) {
-                    dicTypeCode = typeDictionaries.get(0).getDicTypeCode();
+                    dicTypeName = typeDictionaries.get(0).getDicTypeName();
                 }
 
                 String fullTitle = formatDictionaryTitle(dicTypeName, dicTypeCode);
@@ -270,11 +270,12 @@ public class WordDocumentGenerator {
     private static Map<String, List<DataDictionary>> groupDictionariesByType(List<DataDictionary> dictionaries) {
         Map<String, List<DataDictionary>> dicTypeMap = new LinkedHashMap<>();
         for (DataDictionary dic : dictionaries) {
-            String dicTypeName = dic.getDicTypeName();
-            if (dicTypeName == null || dicTypeName.trim().isEmpty()) {
-                dicTypeName = "未分类字典";
+            // 使用字典类型代码作为分组键，避免类型名称相同但代码不同导致的重复
+            String dicTypeCode = dic.getDicTypeCode();
+            if (dicTypeCode == null || dicTypeCode.trim().isEmpty()) {
+                dicTypeCode = "UNCLASSIFIED";
             }
-            dicTypeMap.computeIfAbsent(dicTypeName, k -> new ArrayList<>()).add(dic);
+            dicTypeMap.computeIfAbsent(dicTypeCode, k -> new ArrayList<>()).add(dic);
         }
         return dicTypeMap;
     }

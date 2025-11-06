@@ -44,7 +44,7 @@ public class DatabaseService {
             // 查询表信息
             String tableSql = "SELECT TABLE_ID, TABLE_SCHEMA, TABLE_NAME, TABLE_COMMENT, " +
                             "MODULE_NAME, ZONE_COLUMN FROM t_table WHERE TABLE_SCHEMA = ? " +
-                            "ORDER BY MODULE_NAME, TABLE_NAME";
+                            "ORDER BY MODULE_XH, TABLE_NAME";
             
             pstmt = conn.prepareStatement(tableSql);
             pstmt.setString(1, tableSchema);
@@ -199,8 +199,8 @@ public class DatabaseService {
             conn = DriverManager.getConnection(url, username, password);
             logger.info("数据库连接成功，开始导出数据字典");
 
-            // 查询数据字典信息，按字典类型和代码排序
-            String dicSql = "SELECT DIC_ID, DIC_CODE, DIC_NAME, DIC_TYPE_CODE, DIC_TYPE_NAME " +
+            // 查询数据字典信息，按字典类型和代码排序，使用DISTINCT去重
+            String dicSql = "SELECT DISTINCT DIC_CODE, DIC_NAME, DIC_TYPE_CODE, DIC_TYPE_NAME " +
                            "FROM t_table_dic " +
                            "ORDER BY DIC_TYPE_CODE, DIC_CODE";
             
@@ -209,7 +209,6 @@ public class DatabaseService {
 
             while (rs.next()) {
                 DataDictionary dic = new DataDictionary();
-                dic.setDicId(rs.getString("DIC_ID"));
                 dic.setDicCode(rs.getString("DIC_CODE"));
                 dic.setDicName(rs.getString("DIC_NAME"));
                 dic.setDicTypeCode(rs.getString("DIC_TYPE_CODE"));
